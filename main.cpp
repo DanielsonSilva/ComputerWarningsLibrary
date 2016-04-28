@@ -64,8 +64,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 			FreePic();
 			PostQuitMessage(0);
 			break;
-		}
-		
+		}		
 		case WM_COMMAND: {
             if (LOWORD(wParam) == 1) {
 //                MessageBox(hwnd, "Loaded", "Load", MB_OK | MB_ICONINFORMATION);
