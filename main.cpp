@@ -1,10 +1,16 @@
 #include <windows.h>
+#include <sstream>
 #include "Resources.h"
 //#include "Picture.cpp"
+using namespace std;
 
+HINSTANCE g_inst;
 HDC hdcMem = NULL;
 HBITMAP hBmp = NULL;
 HBITMAP hBmpOld = NULL;
+HWND Counter = NULL; // coutner for closing the program
+int WIDTH  = 800; // window's width
+int HEIGHT = 600; // window's height
 
 // call this function once in your WM_COMMAND handler, or wherever you want the image to be loaded
 void LoadPic(HDC hWinDC) {
@@ -80,6 +86,47 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 			EndPaint( hwnd, &ps );
 			break;
 		}
+		case WM_CREATE: {
+			Counter = 
+				CreateWindowEx (
+					0,
+					"STATIC",
+					"",
+					WS_VISIBLE|WS_CHILD,
+					10, 10, 500, 20,
+					hwnd,
+					NULL,
+					g_inst,
+					NULL
+				);
+			float sec = 10;
+			for (int i = 0; i < 5; i++) {
+				
+				Sleep(500);
+				::SetWindowPos(hwnd ,       // handle to window
+	                HWND_TOPMOST,  // placement-order handle
+	                (GetSystemMetrics(SM_CXSCREEN) - WIDTH) /2, // x
+					(GetSystemMetrics(SM_CYSCREEN) - HEIGHT)/2 - 15, // y 
+					WIDTH,  // width  
+					HEIGHT, // height 
+	                SWP_NOMOVE|SWP_NOSIZE // window-positioning options
+				);
+				CreateWindowEx (
+					0,
+					"STATIC",
+					"",
+					WS_VISIBLE|WS_CHILD,
+					10, 10, 500, 20,
+					hwnd,
+					NULL,
+					g_inst,
+					NULL
+				);
+			}
+			//FreePic();
+			//PostQuitMessage(0);
+			break;
+		}
 		/* All other messages (a lot of them) are processed using default procedures */
 		default:
 			return DefWindowProc(hwnd, Message, wParam, lParam);
@@ -111,14 +158,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 	
-	int WIDTH = 1200;
-	int HEIGHT = 800;
+	int WIDTH  = 800;
+	int HEIGHT = 600;
 
 	hwnd = CreateWindowEx(
 		WS_EX_CLIENTEDGE,
 		"WindowClass",
 		"AVISO DOS COMPUTADORES DA BIBLIOTECA IFRN/PARNAMIRIM", /* caption */
-		WS_VISIBLE|WS_OVERLAPPEDWINDOW,
+		WS_VISIBLE|WS_OVERLAPPEDWINDOW&~WS_MAXIMIZEBOX&~WS_THICKFRAME&~WS_TABSTOP&~WS_MINIMIZEBOX | WS_DISABLED,
 		(GetSystemMetrics(SM_CXSCREEN) - WIDTH) /2, /* x */
 		(GetSystemMetrics(SM_CYSCREEN) - HEIGHT)/2 - 15, /* y */
 		WIDTH,  /* width  */
@@ -128,7 +175,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		hInstance,
 		NULL
 	);
-
+	//WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX
 	if(hwnd == NULL) {
 		MessageBox(NULL, "Window Creation Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
 		return 0;
