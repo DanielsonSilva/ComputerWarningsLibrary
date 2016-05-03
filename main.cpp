@@ -2,15 +2,14 @@
 #include <sstream>
 #include "Resources.h"
 //#include "Picture.cpp"
-using namespace std;
 
 HINSTANCE g_inst;
 HDC hdcMem = NULL;
 HBITMAP hBmp = NULL;
 HBITMAP hBmpOld = NULL;
 HWND Counter = NULL; // coutner for closing the program
-int WIDTH  = 800; // window's width
-int HEIGHT = 600; // window's height
+int WIDTH  = 1100; // window's width
+int HEIGHT = 700; // window's height
 
 // call this function once in your WM_COMMAND handler, or wherever you want the image to be loaded
 void LoadPic(HDC hWinDC) {
@@ -18,7 +17,8 @@ void LoadPic(HDC hWinDC) {
 		return;  // already loaded, no need to load it again
 
 	// note:  here you must put the file name in a TEXT() macro.  DO NOT CAST IT TO LPCSTR
-	hBmp = (HBITMAP)LoadImage(NULL,TEXT("C:/Users/1896491/Desktop/Danielson/workspace/ComputerWarningsLibrary/teste2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
+	hBmp = (HBITMAP)LoadImage(NULL,TEXT("./teste2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
+	//hBmp = (HBITMAP)LoadImage(NULL,TEXT("C:/Users/1896491/Desktop/Danielson/workspace/ComputerWarningsLibrary/teste2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
 
 	if(!hBmp) {  // the load failed (couldn't find file?  Invalid file?)
 		::MessageBox(NULL, TEXT("LoadImage Failed"), TEXT("Error"), MB_OK);
@@ -82,28 +82,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 			PAINTSTRUCT ps;
 			HDC screen = BeginPaint(hwnd,&ps);
 			LoadPic(screen);
-			//StretchBlt( screen, ... /* fill in your coords and junk here );
-			EndPaint( hwnd, &ps );
-			break;
-		}
-		case WM_CREATE: {
-			Counter = 
-				CreateWindowEx (
-					0,
-					"STATIC",
-					"",
-					WS_VISIBLE|WS_CHILD,
-					10, 10, 500, 20,
-					hwnd,
-					NULL,
-					g_inst,
-					NULL
-				);
-			float sec = 10;
-			for (int i = 0; i < 5; i++) {
-				
-				Sleep(500);
-				::SetWindowPos(hwnd ,       // handle to window
+			float sec = 10; // time, in seconds, that the program will remain in screen
+			char *tempo; // = malloc(50);
+			for (int i = 0; i <= (sec*10); i++) {
+				Sleep(100);
+				::SetWindowPos(
+					hwnd,       // handle to window
 	                HWND_TOPMOST,  // placement-order handle
 	                (GetSystemMetrics(SM_CXSCREEN) - WIDTH) /2, // x
 					(GetSystemMetrics(SM_CYSCREEN) - HEIGHT)/2 - 15, // y 
@@ -111,20 +95,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 					HEIGHT, // height 
 	                SWP_NOMOVE|SWP_NOSIZE // window-positioning options
 				);
-				CreateWindowEx (
+				sprintf(tempo, "AVISOS DOS COMPUTADORES DA BIBLIOTECA IFRN/PARNAMIRIM - Liberado em: %.1f segundos", (sec - (i/10.0)));
+				SetWindowText(hwnd,tempo);				
+			}
+			FreePic();
+			PostQuitMessage(0);
+			EndPaint( hwnd, &ps );
+			break;
+		}
+		case WM_CREATE: {
+				/*CreateWindowEx (
 					0,
 					"STATIC",
-					"",
+					"Danielson GGGaasd 1212",
 					WS_VISIBLE|WS_CHILD,
-					10, 10, 500, 20,
+					10, 10, 500, 50,
 					hwnd,
 					NULL,
 					g_inst,
 					NULL
-				);
-			}
-			//FreePic();
-			//PostQuitMessage(0);
+				);*/
 			break;
 		}
 		/* All other messages (a lot of them) are processed using default procedures */
@@ -157,9 +147,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		MessageBox(NULL, "Window Registration Failed!","Error!",MB_ICONEXCLAMATION|MB_OK);
 		return 0;
 	}
-	
-	int WIDTH  = 800;
-	int HEIGHT = 600;
 
 	hwnd = CreateWindowEx(
 		WS_EX_CLIENTEDGE,
@@ -189,5 +176,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		TranslateMessage(&msg); /* Translate key codes to chars if present */
 		DispatchMessage(&msg); /* Send it to WndProc */
 	}
+	
 	return msg.wParam;
 }
